@@ -11,9 +11,6 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "account")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Account extends BaseEntity{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @GenericGenerator(name = "native")
     @Column(name = "customer_id")
     private long customerId;
 
