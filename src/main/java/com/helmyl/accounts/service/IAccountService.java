@@ -18,4 +18,13 @@ public interface IAccountService {
      * @return CustomerDTO object
      */
     CustomerDTO getAccountByEmail(String email);
+
+
+    /**
+     * Update account
+     *
+     * @param customerDTO - CustomerDTO object
+     * @return boolean
+     */
+    boolean updateAccount(CustomerDTO customerDTO);
 }
