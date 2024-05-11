@@ -45,7 +45,7 @@ public class AccountController {
         } else {
             return ResponseEntity
                     .status(HttpStatus.NOT_MODIFIED)
-                    .body(new ResponseDTO(AccountConstants.STATUS_500, AccountConstants.MESSAGE_500));
+                    .body(new ResponseDTO(AccountConstants.STATUS_304, AccountConstants.MESSAGE_304));
         }
     }
 }
