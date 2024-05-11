@@ -1,10 +1,13 @@
 package com.helmyl.accounts.service.impl;
 
 import com.helmyl.accounts.constants.AccountConstants;
+import com.helmyl.accounts.dto.AccountDTO;
 import com.helmyl.accounts.dto.CustomerDTO;
 import com.helmyl.accounts.entity.Account;
 import com.helmyl.accounts.entity.Customer;
 import com.helmyl.accounts.exception.CustomerAlreadyExistException;
+import com.helmyl.accounts.exception.ResourceNotFoundException;
+import com.helmyl.accounts.mapper.AccountMapper;
 import com.helmyl.accounts.mapper.CustomerMapper;
 import com.helmyl.accounts.repository.AccountRepository;
 import com.helmyl.accounts.repository.CustomerRepository;
@@ -38,6 +41,28 @@ public class AccountServiceImpl implements IAccountService {
         customer.setCreatedAt(LocalDateTime.now());
         Customer savedCustomer = customerRepository.save(customer);
         accountRepository.save(createNewAccount(savedCustomer));
+    }
+
+    /**
+     * Get account by email
+     *
+     * @param email - email of the account
+     * @return CustomerDTO object
+     */
+    @Override
+    public CustomerDTO getAccountByEmail(String email) {
+        Customer customer = customerRepository.findByEmail(email).orElseThrow(
+                () -> new ResourceNotFoundException("Customer", "email", email)
+        );
+
+        Account account = accountRepository.findByCustomerId(customer.getCustomerId()).orElseThrow(
+                () -> new ResourceNotFoundException("Account", "customerId", customer.getCustomerId())
+        );
+
+        CustomerDTO customerDTO = CustomerMapper.mapToCustomerDTO(customer, new CustomerDTO());
+        customerDTO.setAccountDTO(AccountMapper.mapToAccountDTO(account, new AccountDTO()));
+
+        return customerDTO;
     }
 
     /**

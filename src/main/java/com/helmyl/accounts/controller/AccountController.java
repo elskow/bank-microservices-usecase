@@ -5,10 +5,10 @@ import com.helmyl.accounts.dto.CustomerDTO;
 import com.helmyl.accounts.dto.ResponseDTO;
 import com.helmyl.accounts.service.IAccountService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/api", produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -23,5 +23,14 @@ public class AccountController {
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDTO(AccountConstants.MESSAGE_201, AccountConstants.STATUS_201));
 
+    }
+
+    @GetMapping("/accounts")
+    public ResponseEntity<CustomerDTO> getAccountbyEmail(@RequestParam String email) {
+        CustomerDTO customerDTO = accountService.getAccountByEmail(email);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(customerDTO);
     }
 }

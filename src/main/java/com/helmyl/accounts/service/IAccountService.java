@@ -9,4 +9,13 @@ public interface IAccountService {
         * @param customerDTO - CustomerDTO object
      */
     void createAccount(CustomerDTO customerDTO);
+
+
+    /**
+     * Get account by email
+     *
+     * @param email - email of the account
+     * @return CustomerDTO object
+     */
+    CustomerDTO getAccountByEmail(String email);
 }
