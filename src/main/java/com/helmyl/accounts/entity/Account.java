@@ -5,10 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-@Table(name = "account")
+@Table(name = "accounts")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Account extends BaseEntity{
     @Column(name = "customer_id")

@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-@Table(name = "customer")
+@Table(name = "customers")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Customer extends BaseEntity{
     @Id
