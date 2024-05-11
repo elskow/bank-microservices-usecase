@@ -48,4 +48,19 @@ public class AccountController {
                     .body(new ResponseDTO(AccountConstants.STATUS_304, AccountConstants.MESSAGE_304));
         }
     }
+
+    @DeleteMapping("/accounts")
+    public ResponseEntity<ResponseDTO> deleteAccount(@RequestParam String email) {
+        boolean isDeleted = iAccountService.deleteAccount(email);
+
+        if (isDeleted) {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new ResponseDTO(AccountConstants.STATUS_200, AccountConstants.MESSAGE_200));
+        } else {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_MODIFIED)
+                    .body(new ResponseDTO(AccountConstants.STATUS_304, AccountConstants.MESSAGE_304));
+        }
+    }
 }

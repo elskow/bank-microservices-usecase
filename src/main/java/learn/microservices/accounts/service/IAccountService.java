@@ -27,4 +27,12 @@ public interface IAccountService {
      * @return boolean
      */
     boolean updateAccount(CustomerDTO customerDTO);
+
+    /**
+     * Delete account
+     *
+     * @param email - email of the account
+     * @return boolean
+     */
+    boolean deleteAccount(String email);
 }
