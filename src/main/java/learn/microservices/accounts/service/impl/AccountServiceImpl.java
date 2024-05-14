@@ -15,7 +15,6 @@ import learn.microservices.accounts.service.IAccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -38,7 +37,6 @@ public class AccountServiceImpl implements IAccountService {
             throw new CustomerAlreadyExistException("Email has already been registered");
         }
 
-        customer.setCreatedAt(LocalDateTime.now());
         Customer savedCustomer = customerRepository.save(customer);
         accountRepository.save(createNewAccount(savedCustomer));
     }
@@ -124,7 +122,6 @@ public class AccountServiceImpl implements IAccountService {
         newAccount.setAccountType(AccountConstants.SAVINGS);
         newAccount.setAccountNumber(randomAccountNumber);
         newAccount.setBranchAddress(AccountConstants.ADDRESS);
-        newAccount.setCreatedAt(LocalDateTime.now());
 
         return newAccount;
     }
