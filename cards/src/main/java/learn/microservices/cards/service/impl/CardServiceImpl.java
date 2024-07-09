@@ -34,17 +34,6 @@ public class CardServiceImpl implements ICardService {
         if (cardOptional.isPresent()) {
             throw new CardAlreadyExistException("Card already exists for the given NIK: " + nik);
         }
-
-        cardRepository.save(createNewCard(nik));
-    }
-
-    /**
-     * Create a new card with a unique card number.
-     *
-     * @param nik the NIK of the customer
-     * @return the new card
-     */
-    private Card createNewCard(String nik) {
         boolean isUnique = false;
         long cardNumber = 0;
         Random random = new Random();
@@ -70,7 +59,7 @@ public class CardServiceImpl implements ICardService {
         newCard.setAmountUsed(0);
         newCard.setAvailableAmount(CREDIT_LIMIT);
 
-        return newCard;
+        cardRepository.save(newCard);
     }
 
     /**
