@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS `loans`
     `amount_paid`        int          NOT NULL,
     `outstanding_amount` int          NOT NULL,
     `created_at`         date         NOT NULL,
-    `updated_at`         date DEFAULT NULL,
+    `created_by`         varchar(255) NOT NULL,
+    `updated_at`         date         DEFAULT NULL,
+    `updated_by`         varchar(255) DEFAULT NULL,
     PRIMARY KEY (`loan_id`)
 );

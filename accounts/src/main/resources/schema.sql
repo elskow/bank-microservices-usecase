@@ -4,7 +4,9 @@ CREATE TABLE IF NOT EXISTS `customers`
     `name`        VARCHAR(255) NOT NULL,
     `nik`         VARCHAR(16)  NOT NULL,
     `created_at`  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at`  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    `created_by`  VARCHAR(255) NOT NULL,
+    `updated_at`  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_by`  VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS `accounts`
@@ -14,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `accounts`
     `account_type`   VARCHAR(50)  NOT NULL,
     `branch_address` VARCHAR(255) NOT NULL,
     `created_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `created_by`     VARCHAR(255) NOT NULL,
     `updated_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES customers (customer_id)
+    `updated_by`     VARCHAR(255) NOT NULL,
 );
