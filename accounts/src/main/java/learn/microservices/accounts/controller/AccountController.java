@@ -1,7 +1,7 @@
 package learn.microservices.accounts.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 import learn.microservices.accounts.constants.AccountConstants;
 import learn.microservices.accounts.dto.CustomerDTO;
 import learn.microservices.accounts.dto.ResponseDTO;
@@ -32,10 +32,10 @@ public class AccountController {
     }
 
     @GetMapping("/accounts")
-    public ResponseEntity<CustomerDTO> getAccountbyEmail(@RequestParam
-                                                         @Email(message = "Email is invalid")
-                                                         String email) {
-        CustomerDTO customerDTO = iAccountService.getAccountByEmail(email);
+    public ResponseEntity<CustomerDTO> getAccountbyNik(@RequestParam
+                                                       @Size(min = 16, max = 16, message = "NIK should have 16 characters")
+                                                       String nik) {
+        CustomerDTO customerDTO = iAccountService.getAccountByNik(nik);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -61,9 +61,9 @@ public class AccountController {
 
     @DeleteMapping("/accounts")
     public ResponseEntity<ResponseDTO> deleteAccount(@RequestParam
-                                                     @Email(message = "Email is invalid")
-                                                     String email) {
-        boolean isDeleted = iAccountService.deleteAccount(email);
+                                                     @Size(min = 16, max = 16, message = "NIK should have 16 characters")
+                                                     String nik) {
+        boolean isDeleted = iAccountService.deleteAccount(nik);
 
         if (isDeleted) {
             return ResponseEntity

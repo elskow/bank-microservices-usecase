@@ -4,20 +4,20 @@ import learn.microservices.accounts.dto.CustomerDTO;
 
 public interface IAccountService {
     /*
-        * Create a new account
-        *
-        * @param customerDTO - CustomerDTO object
+     * Create a new account
+     *
+     * @param customerDTO - CustomerDTO object
      */
     void createAccount(CustomerDTO customerDTO);
 
 
     /**
-     * Get account by email
+     * Get account by NIK
      *
-     * @param email - email of the account
+     * @param nik - nik of the account
      * @return CustomerDTO object
      */
-    CustomerDTO getAccountByEmail(String email);
+    CustomerDTO getAccountByNik(String nik);
 
 
     /**
@@ -31,8 +31,8 @@ public interface IAccountService {
     /**
      * Delete account
      *
-     * @param email - email of the account
+     * @param nik - nik of the account
      * @return boolean
      */
-    boolean deleteAccount(String email);
+    boolean deleteAccount(String nik);
 }

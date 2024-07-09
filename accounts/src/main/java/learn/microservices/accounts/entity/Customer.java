@@ -9,8 +9,11 @@ import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "customers")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
-public class Customer extends BaseEntity{
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Customer extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @GenericGenerator(name = "native")
@@ -20,6 +23,6 @@ public class Customer extends BaseEntity{
     @Column(name = "name")
     private String name;
 
-    @Column(name = "email")
-    private String email;
+    @Column(name = "nik")
+    private String nik;
 }

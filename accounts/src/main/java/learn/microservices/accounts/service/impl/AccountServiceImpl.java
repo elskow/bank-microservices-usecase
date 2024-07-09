@@ -32,9 +32,9 @@ public class AccountServiceImpl implements IAccountService {
     public void createAccount(CustomerDTO customerDTO) {
         Customer customer = CustomerMapper.mapToCustomer(customerDTO, new Customer());
 
-        Optional<Customer> existingCustomer = customerRepository.findByEmail(customerDTO.getEmail());
+        Optional<Customer> existingCustomer = customerRepository.findByNik(customerDTO.getNik());
         if (existingCustomer.isPresent()) {
-            throw new CustomerAlreadyExistException("Email has already been registered");
+            throw new CustomerAlreadyExistException("NIK has already been registered");
         }
 
         Customer savedCustomer = customerRepository.save(customer);
@@ -42,15 +42,15 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     /**
-     * Get account by email
+     * Get account by nik
      *
-     * @param email - email of the account
+     * @param nik - nik of the account
      * @return CustomerDTO object
      */
     @Override
-    public CustomerDTO getAccountByEmail(String email) {
-        Customer customer = customerRepository.findByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException("Customer", "email", email)
+    public CustomerDTO getAccountByNik(String nik) {
+        Customer customer = customerRepository.findByNik(nik).orElseThrow(
+                () -> new ResourceNotFoundException("Customer", "nik", nik)
         );
 
         Account account = accountRepository.findByCustomerId(customer.getCustomerId()).orElseThrow(
@@ -96,9 +96,9 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
-    public boolean deleteAccount(String email) {
-        Customer customer = customerRepository.findByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException("Customer", "email", email)
+    public boolean deleteAccount(String nik) {
+        Customer customer = customerRepository.findByNik(nik).orElseThrow(
+                () -> new ResourceNotFoundException("Customer", "nik", nik)
         );
 
         accountRepository.deleteByCustomerId(customer.getCustomerId());
