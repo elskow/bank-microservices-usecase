@@ -1,8 +1,11 @@
 package learn.microservices.cards.constants;
 
 public class CardConstants {
-    public static final String SAVINGS = "Savings";
-    public static final String ADDRESS = "Acmes Street";
+    public static final String CREDIT_CARD = "Credit Card";
+    public static final String DEBIT_CARD = "Debit Card";
+    public static final int CREDIT_LIMIT = 1_000_000;
+    public static final int DEBIT_LIMIT = 100_000;
+
     public static final String STATUS_201 = "201";
     public static final String MESSAGE_201 = "Account created successfully";
     public static final String STATUS_200 = "200";
