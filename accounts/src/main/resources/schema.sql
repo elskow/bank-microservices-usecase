@@ -18,5 +18,5 @@ CREATE TABLE IF NOT EXISTS `accounts`
     `created_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `created_by`     VARCHAR(255) NOT NULL,
     `updated_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_by`     VARCHAR(255) NOT NULL,
+    `updated_by`     VARCHAR(255) NOT NULL
 );
