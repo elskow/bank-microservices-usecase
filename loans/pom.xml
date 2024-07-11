@@ -82,14 +82,18 @@
                 <version>3.4.3</version>
                 <configuration>
                     <to>
-                        <image>${project.artifactId}</image>
+                        <image>helmyl/${project.artifactId}-ms</image>
                         <tags>
                             <tag>latest</tag>
                         </tags>
                     </to>
+                    <container>
+                        <ports>
+                            <port>8090</port>
+                        </ports>
+                    </container>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
 </project>

@@ -1,0 +1,23 @@
+services:
+  accounts:
+    image: "helmyl/accounts-ms"
+    ports:
+      - "8080:8080"
+    networks:
+      - bank-loan
+  cards:
+    image: "helmyl/cards-ms"
+    ports:
+      - "9000:9000"
+    networks:
+      - bank-loan
+  loans:
+    image: "helmyl/loans-ms"
+    ports:
+      - "8090:8090"
+    networks:
+      - bank-loan
+
+networks:
+  bank-loan:
+    driver: bridge
