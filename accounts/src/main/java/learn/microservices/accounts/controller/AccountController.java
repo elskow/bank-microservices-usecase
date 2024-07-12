@@ -6,7 +6,8 @@ import learn.microservices.accounts.constants.AccountConstants;
 import learn.microservices.accounts.dto.CustomerDTO;
 import learn.microservices.accounts.dto.ResponseDTO;
 import learn.microservices.accounts.service.IAccountService;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +16,17 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/api", produces = {MediaType.APPLICATION_JSON_VALUE})
-@AllArgsConstructor
 @Validated
 public class AccountController {
-    private IAccountService iAccountService;
+    private final IAccountService iAccountService;
+
+    @Value("${build.version}")
+    private String buildInfo;
+
+    @Autowired
+    public AccountController(IAccountService iAccountService) {
+        this.iAccountService = iAccountService;
+    }
 
     @PostMapping("/accounts")
     public ResponseEntity<ResponseDTO> createAccount(@RequestBody
@@ -74,5 +82,12 @@ public class AccountController {
                     .status(HttpStatus.NOT_MODIFIED)
                     .body(new ResponseDTO(AccountConstants.STATUS_304, AccountConstants.MESSAGE_304));
         }
+    }
+
+    @GetMapping("/build-info")
+    public ResponseEntity<String> getBuildInfo() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(buildInfo);
     }
 }
