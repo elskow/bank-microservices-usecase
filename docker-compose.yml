@@ -1,20 +1,73 @@
 services:
+  rabbitmq:
+    image: "rabbitmq:3.13.4-management"
+    hostname: "rabbitmq"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - bank-loan
+
+  config-server:
+    image: "helmyl/config-server"
+    ports:
+      - "8071:8071"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - bank-loan
+    environment:
+      SPRING_RABBITMQ_HOST: "rabbitmq"
+  
   accounts:
     image: "helmyl/accounts-ms"
     ports:
       - "8080:8080"
+    depends_on:
+      config-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/
+      SPRING_RABBITMQ_HOST: "rabbitmq"
     networks:
       - bank-loan
+
   cards:
     image: "helmyl/cards-ms"
     ports:
       - "9000:9000"
+    depends_on:
+      config-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/
+      SPRING_RABBITMQ_HOST: "rabbitmq"
     networks:
       - bank-loan
+
   loans:
     image: "helmyl/loans-ms"
     ports:
       - "8090:8090"
+    depends_on:
+      config-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/
+      SPRING_RABBITMQ_HOST: "rabbitmq"
     networks:
       - bank-loan
 
