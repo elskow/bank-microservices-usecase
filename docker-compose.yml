@@ -14,8 +14,39 @@ services:
     networks:
       - bank-loan
 
+  accounts-db:
+    image: postgres
+    container_name: accountsdb
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: accountsdb
+    networks:
+      - accounts-db
+
+  cards-db:
+    image: postgres
+    container_name: cardsdb
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: cardsdb
+    networks:
+      - cards-db
+
+  loans-db:
+    image: postgres
+    container_name: loansdb
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: loansdb
+    networks:
+      - loans-db
+
   config-server:
     image: "helmyl/config-server"
+    container_name: config-server
     ports:
       - "8071:8071"
     depends_on:
@@ -34,6 +65,7 @@ services:
   
   accounts:
     image: "helmyl/accounts-ms"
+    container_name: accounts-ms
     ports:
       - "8080:8080"
     depends_on:
@@ -42,11 +74,14 @@ services:
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/
       SPRING_RABBITMQ_HOST: "rabbitmq"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://accounts-db:5432/accountsdb
     networks:
       - bank-loan
+      - accounts-db
 
   cards:
     image: "helmyl/cards-ms"
+    container_name: cards-ms
     ports:
       - "9000:9000"
     depends_on:
@@ -55,11 +90,14 @@ services:
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/
       SPRING_RABBITMQ_HOST: "rabbitmq"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://cards-db:5432/cardsdb
     networks:
       - bank-loan
+      - cards-db
 
   loans:
     image: "helmyl/loans-ms"
+    container_name: loans-ms
     ports:
       - "8090:8090"
     depends_on:
@@ -68,9 +106,17 @@ services:
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/
       SPRING_RABBITMQ_HOST: "rabbitmq"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://loans-db:5432/loansdb
     networks:
       - bank-loan
+      - loans-db
 
 networks:
   bank-loan:
+    driver: bridge
+  accounts-db:
+    driver: bridge
+  cards-db:
+    driver: bridge
+  loans-db:
     driver: bridge
