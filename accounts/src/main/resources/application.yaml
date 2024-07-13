@@ -17,10 +17,15 @@ spring:
       ddl-auto: update
     show-sql: true
 
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+
   h2:
     console:
       enabled: true
 
-
-build:
-  version: 0.0.1-beta
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

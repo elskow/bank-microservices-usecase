@@ -1,12 +1,12 @@
-package learn.microservices.cards.controller;
+package learn.microservices.loans.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
-import learn.microservices.cards.constants.CardConstants;
-import learn.microservices.cards.dto.CardDTO;
-import learn.microservices.cards.dto.DevInfoDTO;
-import learn.microservices.cards.dto.ResponseDTO;
-import learn.microservices.cards.service.ICardService;
+import learn.microservices.loans.constants.LoanConstants;
+import learn.microservices.loans.dto.DevInfoDTO;
+import learn.microservices.loans.dto.LoanDTO;
+import learn.microservices.loans.dto.ResponseDTO;
+import learn.microservices.loans.service.ILoanService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.env.Environment;
@@ -20,70 +20,69 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/api", produces = {MediaType.APPLICATION_JSON_VALUE})
 @Validated
 @RefreshScope
-public class CardController {
-    private final ICardService iCardService;
-
+public class LoanController {
+    private final ILoanService iLoanService;
     private final Environment environment;
     private final DevInfoDTO devInfoDTO;
 
     @Value("${build.version}")
     private String buildInfo;
 
-    public CardController(ICardService iCardService, Environment environment, DevInfoDTO devInfoDTO) {
-        this.iCardService = iCardService;
+    public LoanController(ILoanService iLoanService, Environment environment, DevInfoDTO devInfoDTO) {
+        this.iLoanService = iLoanService;
         this.environment = environment;
         this.devInfoDTO = devInfoDTO;
     }
 
-    @PostMapping("/cards")
+    @PostMapping("/loans")
     public ResponseEntity<ResponseDTO> createCard(@RequestParam
                                                   @Size(min = 16, max = 16, message = "NIK should have 16 characters")
                                                   String nik) {
-        iCardService.createCard(nik);
+        iLoanService.createLoan(nik);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ResponseDTO(CardConstants.MESSAGE_201, CardConstants.STATUS_201));
+                .body(new ResponseDTO(LoanConstants.MESSAGE_201, LoanConstants.STATUS_201));
     }
 
-    @GetMapping("/cards")
-    public ResponseEntity<CardDTO> getCardByNik(@RequestParam
+    @GetMapping("/loans")
+    public ResponseEntity<LoanDTO> getLoanByNik(@RequestParam
                                                 @Size(min = 16, max = 16, message = "NIK should have 16 characters")
                                                 String nik) {
-        CardDTO cardDTO = iCardService.getCardByNik(nik);
+        LoanDTO loanDTO = iLoanService.getLoanByNik(nik);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(cardDTO);
+                .body(loanDTO);
     }
 
-    @PutMapping("/cards")
-    public ResponseEntity<ResponseDTO> updateCard(@RequestBody
+    @PutMapping("/loans")
+    public ResponseEntity<ResponseDTO> updateLoan(@RequestBody
                                                   @Valid
-                                                  CardDTO cardDTO) {
-        boolean isUpdated = iCardService.updateCard(cardDTO);
+                                                  LoanDTO loanDTO) {
+        boolean isUpdated = iLoanService.updateLoan(loanDTO);
         if (isUpdated) {
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new ResponseDTO(CardConstants.STATUS_200, CardConstants.MESSAGE_200));
+                    .body(new ResponseDTO(LoanConstants.STATUS_200, LoanConstants.MESSAGE_200));
         } else {
             return ResponseEntity
                     .status(HttpStatus.NOT_MODIFIED)
-                    .body(new ResponseDTO(CardConstants.STATUS_304, CardConstants.MESSAGE_304));
+                    .body(new ResponseDTO(LoanConstants.STATUS_304, LoanConstants.MESSAGE_304));
         }
     }
 
-    @DeleteMapping("/cards")
-    public ResponseEntity<ResponseDTO> deleteCard(@RequestParam
+    @DeleteMapping("/loans")
+    public ResponseEntity<ResponseDTO> deleteLoan(@RequestParam
                                                   @Size(min = 16, max = 16, message = "NIK should have 16 characters")
                                                   String nik) {
-        boolean isDeleted = iCardService.deleteCard(nik);
+        boolean isDeleted = iLoanService.deleteLoan(nik);
         if (isDeleted) {
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new ResponseDTO(CardConstants.STATUS_200, CardConstants.MESSAGE_200));
+                    .body(new ResponseDTO(LoanConstants.STATUS_200, LoanConstants.MESSAGE_200));
         } else {
             return ResponseEntity
                     .status(HttpStatus.NOT_MODIFIED)
-                    .body(new ResponseDTO(CardConstants.STATUS_304, CardConstants.MESSAGE_304));
+                    .body(new ResponseDTO(LoanConstants.STATUS_304, LoanConstants.MESSAGE_304));
         }
     }
 

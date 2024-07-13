@@ -4,10 +4,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import learn.microservices.accounts.constants.AccountConstants;
 import learn.microservices.accounts.dto.CustomerDTO;
+import learn.microservices.accounts.dto.DevInfoDTO;
 import learn.microservices.accounts.dto.ResponseDTO;
 import learn.microservices.accounts.service.IAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,15 +20,21 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(path = "/api", produces = {MediaType.APPLICATION_JSON_VALUE})
 @Validated
+@RefreshScope
 public class AccountController {
     private final IAccountService iAccountService;
+    
+    private final Environment environment;
+    private final DevInfoDTO devInfoDTO;
 
     @Value("${build.version}")
     private String buildInfo;
 
     @Autowired
-    public AccountController(IAccountService iAccountService) {
+    public AccountController(IAccountService iAccountService, Environment environment, DevInfoDTO devInfoDTO) {
         this.iAccountService = iAccountService;
+        this.environment = environment;
+        this.devInfoDTO = devInfoDTO;
     }
 
     @PostMapping("/accounts")
@@ -89,5 +98,19 @@ public class AccountController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(buildInfo);
+    }
+
+    @GetMapping("/java-version")
+    public ResponseEntity<String> getJavaVersion() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(environment.getProperty("java.version"));
+    }
+
+    @GetMapping("/dev-info")
+    public ResponseEntity<DevInfoDTO> getDevInfo() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(devInfoDTO);
     }
 }
