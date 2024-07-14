@@ -1,6 +1,7 @@
 services:
   rabbitmq:
     image: "rabbitmq:3.13.4-management"
+    container_name: rabbitmq
     hostname: "rabbitmq"
     ports:
       - "5672:5672"
@@ -44,6 +45,7 @@ services:
     networks:
       - loans-db
 
+
   config-server:
     image: "helmyl/config-server"
     container_name: config-server
@@ -62,28 +64,39 @@ services:
       - bank-loan
     environment:
       SPRING_RABBITMQ_HOST: "rabbitmq"
-  
-  accounts:
-    image: "helmyl/accounts-ms"
-    container_name: accounts-ms
+
+  eureka-server:
+    image: "helmyl/eureka-server-ms"
+    container_name: eureka-server
     ports:
-      - "8080:8080"
+      - "8070:8070"
     depends_on:
       config-server:
         condition: service_healthy
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/
       SPRING_RABBITMQ_HOST: "rabbitmq"
-      SPRING_DATASOURCE_URL: jdbc:postgresql://accounts-db:5432/accountsdb
+    healthcheck:
+      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
     networks:
       - bank-loan
-      - accounts-db
+
 
   cards:
     image: "helmyl/cards-ms"
     container_name: cards-ms
     ports:
       - "9000:9000"
+    healthcheck:
+      test: "curl --fail --silent localhost:9000/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
     depends_on:
       config-server:
         condition: service_healthy
@@ -91,6 +104,7 @@ services:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/
       SPRING_RABBITMQ_HOST: "rabbitmq"
       SPRING_DATASOURCE_URL: jdbc:postgresql://cards-db:5432/cardsdb
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8070/eureka/
     networks:
       - bank-loan
       - cards-db
@@ -100,6 +114,12 @@ services:
     container_name: loans-ms
     ports:
       - "8090:8090"
+    healthcheck:
+      test: "curl --fail --silent localhost:8090/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
     depends_on:
       config-server:
         condition: service_healthy
@@ -107,8 +127,30 @@ services:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/
       SPRING_RABBITMQ_HOST: "rabbitmq"
       SPRING_DATASOURCE_URL: jdbc:postgresql://loans-db:5432/loansdb
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8070/eureka/
     networks:
       - bank-loan
+      - loans-db
+
+  accounts:
+    image: "helmyl/accounts-ms"
+    container_name: accounts-ms
+    ports:
+      - "8080:8080"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/
+      SPRING_RABBITMQ_HOST: "rabbitmq"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://accounts-db:5432/accountsdb
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8070/eureka/
+    networks:
+      - bank-loan
+      - accounts-db
+      - cards-db
       - loans-db
 
 networks:
