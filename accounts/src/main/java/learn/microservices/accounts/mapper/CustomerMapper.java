@@ -1,6 +1,7 @@
 package learn.microservices.accounts.mapper;
 
 import learn.microservices.accounts.dto.CustomerDTO;
+import learn.microservices.accounts.dto.CustomerDetailDTO;
 import learn.microservices.accounts.entity.Customer;
 
 public class CustomerMapper {
@@ -8,6 +9,12 @@ public class CustomerMapper {
         customerDTO.setName(customer.getName());
         customerDTO.setNik(customer.getNik());
         return customerDTO;
+    }
+
+    public static CustomerDetailDTO mapToCustomerDetailDTO(Customer customer, CustomerDetailDTO customerDetailDTO) {
+        customerDetailDTO.setName(customer.getName());
+        customerDetailDTO.setNik(customer.getNik());
+        return customerDetailDTO;
     }
 
     public static Customer mapToCustomer(CustomerDTO customerDTO, Customer customer) {
