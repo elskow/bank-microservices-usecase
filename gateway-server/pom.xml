@@ -89,7 +89,7 @@
                 <version>3.4.3</version>
                 <configuration>
                     <to>
-                        <image>helmyl/${project.artifactId}-ms</image>
+                        <image>helmyl/${project.artifactId}</image>
                         <tags>
                             <tag>latest</tag>
                         </tags>
