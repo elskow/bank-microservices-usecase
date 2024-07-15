@@ -31,6 +31,12 @@ management:
       exposure:
         include: "*"
 
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
   endpoint:
     shutdown:
       enabled: true
@@ -39,9 +45,9 @@ management:
     env:
       enabled: true
 
-
 eureka:
   instance:
+    hostname: localhost
     prefer-ip-address: true
   client:
     fetch-registry: true
@@ -54,3 +60,9 @@ info:
     name: cards
     description: "Cards Service"
     version: "0.0.1-3b"
+
+logging:
+  level:
+    learn:
+      microservices:
+        cards: DEBUG

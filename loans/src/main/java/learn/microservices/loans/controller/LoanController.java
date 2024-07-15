@@ -7,6 +7,8 @@ import learn.microservices.loans.dto.DevInfoDTO;
 import learn.microservices.loans.dto.LoanDTO;
 import learn.microservices.loans.dto.ResponseDTO;
 import learn.microservices.loans.service.ILoanService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.env.Environment;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RefreshScope
 public class LoanController {
+    public static final Logger logger = LoggerFactory.getLogger(LoanController.class);
+
     private final ILoanService iLoanService;
     private final Environment environment;
     private final DevInfoDTO devInfoDTO;
@@ -45,9 +49,10 @@ public class LoanController {
     }
 
     @GetMapping("/loans")
-    public ResponseEntity<LoanDTO> getLoanByNik(@RequestParam
-                                                @Size(min = 16, max = 16, message = "NIK should have 16 characters")
-                                                String nik) {
+    public ResponseEntity<LoanDTO> getLoanByNik(@RequestHeader("bankloan-correlation-id") String correlationId,
+                                                @RequestParam @Size(min = 16, max = 16, message = "NIK should have 16 characters") String nik) {
+        logger.debug("correlation-id: {}", correlationId);
+        
         LoanDTO loanDTO = iLoanService.getLoanByNik(nik);
         return ResponseEntity
                 .status(HttpStatus.OK)

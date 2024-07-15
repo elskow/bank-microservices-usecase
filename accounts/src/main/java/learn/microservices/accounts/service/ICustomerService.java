@@ -8,5 +8,5 @@ public interface ICustomerService {
      *
      * @return CustomerDetailDTO
      */
-    CustomerDetailDTO getCustomerDetail(String nik);
+    CustomerDetailDTO getCustomerDetail(String nik, String correlationId);
 }

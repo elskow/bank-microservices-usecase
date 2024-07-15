@@ -33,7 +33,7 @@ public class CustomerServiceImpl implements ICustomerService {
      * @return CustomerDetailDTO
      */
     @Override
-    public CustomerDetailDTO getCustomerDetail(String nik) {
+    public CustomerDetailDTO getCustomerDetail(String nik, String correlationId) {
         Customer customer = customerRepository.findByNik(nik).orElseThrow(
                 () -> new ResourceNotFoundException("Customer", "NIK", nik)
         );
@@ -44,10 +44,10 @@ public class CustomerServiceImpl implements ICustomerService {
         CustomerDetailDTO customerDetailDTO = CustomerMapper.mapToCustomerDetailDTO(customer, new CustomerDetailDTO());
         customerDetailDTO.setAccountDTO(AccountMapper.mapToAccountDTO(account, new AccountDTO()));
 
-        ResponseEntity<CardDTO> cardResponse = cardFeignClient.getCardDetail(nik);
+        ResponseEntity<CardDTO> cardResponse = cardFeignClient.getCardDetail(nik, correlationId);
         customerDetailDTO.setCardDTO(cardResponse.getBody());
 
-        ResponseEntity<LoanDTO> loanResponse = loanFeignClient.getLoanDetail(nik);
+        ResponseEntity<LoanDTO> loanResponse = loanFeignClient.getLoanDetail(nik, correlationId);
         customerDetailDTO.setLoanDTO(loanResponse.getBody());
 
         return customerDetailDTO;

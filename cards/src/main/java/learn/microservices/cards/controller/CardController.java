@@ -7,6 +7,8 @@ import learn.microservices.cards.dto.CardDTO;
 import learn.microservices.cards.dto.DevInfoDTO;
 import learn.microservices.cards.dto.ResponseDTO;
 import learn.microservices.cards.service.ICardService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.env.Environment;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RefreshScope
 public class CardController {
+    public static final Logger logger = LoggerFactory.getLogger(CardController.class);
+
     private final ICardService iCardService;
 
     private final Environment environment;
@@ -46,9 +50,10 @@ public class CardController {
     }
 
     @GetMapping("/cards")
-    public ResponseEntity<CardDTO> getCardByNik(@RequestParam
-                                                @Size(min = 16, max = 16, message = "NIK should have 16 characters")
-                                                String nik) {
+    public ResponseEntity<CardDTO> getCardByNik(@RequestHeader("bankloan-correlation-id") String correlationId,
+                                                @RequestParam @Size(min = 16, max = 16, message = "NIK should have 16 characters") String nik) {
+        logger.debug("correlation-id: {}", correlationId);
+        
         CardDTO cardDTO = iCardService.getCardByNik(nik);
         return ResponseEntity
                 .status(HttpStatus.OK)
