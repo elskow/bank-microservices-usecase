@@ -10,6 +10,7 @@
       <option name="customHeaders">
         <set>
           <option value="bankloan-correlation-id" />
+          <option value="X-User-Type" />
         </set>
       </option>
     </inspection_tool>
