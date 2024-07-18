@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RefreshScope
 public class LoanController {
-    public static final Logger logger = LoggerFactory.getLogger(LoanController.class);
+    private final static Logger logger = LoggerFactory.getLogger(LoanController.class);
 
     private final ILoanService iLoanService;
     private final Environment environment;
@@ -42,18 +42,20 @@ public class LoanController {
     public ResponseEntity<ResponseDTO> createCard(@RequestParam
                                                   @Size(min = 16, max = 16, message = "NIK should have 16 characters")
                                                   String nik) {
+        logger.debug("start-create-loan {}", nik);
         iLoanService.createLoan(nik);
+        logger.debug("end-create-loan {}", nik);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDTO(LoanConstants.MESSAGE_201, LoanConstants.STATUS_201));
     }
 
     @GetMapping("/loans")
-    public ResponseEntity<LoanDTO> getLoanByNik(@RequestHeader("bankloan-correlation-id") String correlationId,
-                                                @RequestParam @Size(min = 16, max = 16, message = "NIK should have 16 characters") String nik) {
-        logger.debug("correlation-id: {}", correlationId);
-        
+    public ResponseEntity<LoanDTO> getLoanByNik(
+            @RequestParam @Size(min = 16, max = 16, message = "NIK should have 16 characters") String nik) {
+        logger.debug("start-fetch-loan {}", nik);
         LoanDTO loanDTO = iLoanService.getLoanByNik(nik);
+        logger.debug("end-fetch-loan {}", nik);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(loanDTO);
@@ -63,7 +65,9 @@ public class LoanController {
     public ResponseEntity<ResponseDTO> updateLoan(@RequestBody
                                                   @Valid
                                                   LoanDTO loanDTO) {
+        logger.debug("start-update-loan {}", loanDTO.getNik());
         boolean isUpdated = iLoanService.updateLoan(loanDTO);
+        logger.debug("end-update-loan {}", loanDTO.getNik());
         if (isUpdated) {
             return ResponseEntity
                     .status(HttpStatus.OK)
@@ -79,7 +83,9 @@ public class LoanController {
     public ResponseEntity<ResponseDTO> deleteLoan(@RequestParam
                                                   @Size(min = 16, max = 16, message = "NIK should have 16 characters")
                                                   String nik) {
+        logger.debug("start-delete-loan {}", nik);
         boolean isDeleted = iLoanService.deleteLoan(nik);
+        logger.debug("end-delete-loan {}", nik);
         if (isDeleted) {
             return ResponseEntity
                     .status(HttpStatus.OK)

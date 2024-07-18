@@ -1,6 +1,7 @@
 services:
   read:
     image: grafana/loki:3.0.0
+    container_name: loki-read
     command: "-config.file=/etc/loki/config.yaml -target=read"
     ports:
       - "3101:3100"
@@ -22,6 +23,7 @@ services:
 
   write:
     image: grafana/loki:3.0.0
+    container_name: loki-write
     command: "-config.file=/etc/loki/config.yaml -target=write"
     ports:
       - "3102:3100"
@@ -41,6 +43,7 @@ services:
 
   alloy:
     image: grafana/alloy-dev:latest
+    container_name: alloy
     volumes:
       - ./observability/alloy/alloy-local-config.yaml:/etc/alloy/config.alloy:ro
       - /var/run/docker.sock:/var/run/docker.sock
@@ -54,6 +57,7 @@ services:
 
   minio:
     image: minio/minio
+    container_name: minio
     entrypoint:
       - sh
       - -euc
@@ -88,8 +92,26 @@ services:
     networks:
       - bank-loan
 
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: -config.file /etc/tempo-config.yml
+    volumes:
+      - ./observability/tempo/tempo.yml:/etc/tempo-config.yml
+    ports:
+      - "3110:3100"
+      - "4317:4317"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:4317/health" ]
+      interval: 15s
+      timeout: 20s
+      retries: 20
+    networks:
+      - bank-loan
+
   grafana:
     image: grafana/grafana:latest
+    container_name: grafana
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
       - GF_AUTH_ANONYMOUS_ENABLED=true
@@ -115,6 +137,7 @@ services:
 
   backend:
     image: grafana/loki:3.0.0
+    container_name: loki-backend
     volumes:
       - ./observability/loki/loki-config.yaml:/etc/loki/config.yaml
     ports:
@@ -129,6 +152,7 @@ services:
 
   gateway:
     image: nginx:latest
+    container_name: grafana-gateway
     depends_on:
       - read
       - write
@@ -212,6 +236,27 @@ services:
     networks:
       - bank-loan
 
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - bank-loan
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+
   accounts-db:
     image: postgres
     container_name: accountsdb
@@ -221,6 +266,14 @@ services:
       POSTGRES_DB: accountsdb
     networks:
       - accounts-db
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
   cards-db:
     image: postgres
@@ -231,6 +284,14 @@ services:
       POSTGRES_DB: cardsdb
     networks:
       - cards-db
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
   loans-db:
     image: postgres
@@ -241,7 +302,14 @@ services:
       POSTGRES_DB: loansdb
     networks:
       - loans-db
-
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
   config-server:
     image: "helmyl/config-server"
@@ -250,6 +318,8 @@ services:
       - "8071:8071"
     depends_on:
       rabbitmq:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     healthcheck:
       test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
@@ -261,7 +331,12 @@ services:
       - bank-loan
     environment:
       SPRING_RABBITMQ_HOST: "rabbitmq"
+      JAVA_TOOL_OPTIONS: "-javaagent:/app/libs/opentelemetry-javaagent-1.32.0.jar"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
+      OTEL_METRICS_EXPORTER: none
+      OTEL_SERVICE_NAME: config-server
 
+  
   eureka-server:
     image: "helmyl/eureka-server"
     container_name: eureka-server
@@ -270,9 +345,15 @@ services:
     depends_on:
       config-server:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/
       SPRING_RABBITMQ_HOST: "rabbitmq"
+      JAVA_TOOL_OPTIONS: "-javaagent:/app/libs/opentelemetry-javaagent-1.32.0.jar"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
+      OTEL_METRICS_EXPORTER: none
+      OTEL_SERVICE_NAME: eureka-server
     healthcheck:
       test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
       interval: 30s
@@ -297,14 +378,28 @@ services:
     depends_on:
       config-server:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/
       SPRING_RABBITMQ_HOST: "rabbitmq"
       SPRING_DATASOURCE_URL: jdbc:postgresql://cards-db:5432/cardsdb
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8070/eureka/
+      JAVA_TOOL_OPTIONS: "-javaagent:/app/libs/opentelemetry-javaagent-1.32.0.jar"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
+      OTEL_METRICS_EXPORTER: none
+      OTEL_SERVICE_NAME: cards-ms
     networks:
       - bank-loan
       - cards-db
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
   loans:
     image: "helmyl/loans-ms"
@@ -320,14 +415,28 @@ services:
     depends_on:
       config-server:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/
       SPRING_RABBITMQ_HOST: "rabbitmq"
       SPRING_DATASOURCE_URL: jdbc:postgresql://loans-db:5432/loansdb
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8070/eureka/
+      JAVA_TOOL_OPTIONS: "-javaagent:/app/libs/opentelemetry-javaagent-1.32.0.jar"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
+      OTEL_METRICS_EXPORTER: none
+      OTEL_SERVICE_NAME: loans-ms
     networks:
       - bank-loan
       - loans-db
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
   accounts:
     image: "helmyl/accounts-ms"
@@ -350,11 +459,23 @@ services:
       SPRING_RABBITMQ_HOST: "rabbitmq"
       SPRING_DATASOURCE_URL: jdbc:postgresql://accounts-db:5432/accountsdb
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8070/eureka/
+      JAVA_TOOL_OPTIONS: "-javaagent:/app/libs/opentelemetry-javaagent-1.32.0.jar"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
+      OTEL_METRICS_EXPORTER: none
+      OTEL_SERVICE_NAME: accounts-ms
     networks:
       - bank-loan
       - accounts-db
       - cards-db
       - loans-db
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
   gateway-server:
     image: "helmyl/gateway-server"
@@ -364,10 +485,16 @@ services:
     depends_on:
       accounts:
         condition: service_started
+      redis:
+        condition: service_healthy
     environment:
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8071/
       SPRING_RABBITMQ_HOST: "rabbitmq"
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8070/eureka/
+      JAVA_TOOL_OPTIONS: "-javaagent:/app/libs/opentelemetry-javaagent-1.32.0.jar"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
+      OTEL_METRICS_EXPORTER: none
+      OTEL_SERVICE_NAME: gateway-server
     networks:
       - bank-loan
       - accounts-db

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RefreshScope
 public class CardController {
-    public static final Logger logger = LoggerFactory.getLogger(CardController.class);
+    private final static Logger logger = LoggerFactory.getLogger(CardController.class);
 
     private final ICardService iCardService;
 
@@ -43,18 +43,20 @@ public class CardController {
     public ResponseEntity<ResponseDTO> createCard(@RequestParam
                                                   @Size(min = 16, max = 16, message = "NIK should have 16 characters")
                                                   String nik) {
+        logger.debug("start-create-card {}", nik);
         iCardService.createCard(nik);
+        logger.debug("end-create-card {}", nik);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDTO(CardConstants.MESSAGE_201, CardConstants.STATUS_201));
     }
 
     @GetMapping("/cards")
-    public ResponseEntity<CardDTO> getCardByNik(@RequestHeader("bankloan-correlation-id") String correlationId,
-                                                @RequestParam @Size(min = 16, max = 16, message = "NIK should have 16 characters") String nik) {
-        logger.debug("correlation-id: {}", correlationId);
-        
+    public ResponseEntity<CardDTO> getCardByNik(
+            @RequestParam @Size(min = 16, max = 16, message = "NIK should have 16 characters") String nik) {
+        logger.debug("start-fetch-card {}", nik);
         CardDTO cardDTO = iCardService.getCardByNik(nik);
+        logger.debug("end-fetch-card {}", nik);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(cardDTO);
@@ -64,7 +66,9 @@ public class CardController {
     public ResponseEntity<ResponseDTO> updateCard(@RequestBody
                                                   @Valid
                                                   CardDTO cardDTO) {
+        logger.debug("start-update-card {}", cardDTO.getNik());
         boolean isUpdated = iCardService.updateCard(cardDTO);
+        logger.debug("end-update-card {}", cardDTO.getNik());
         if (isUpdated) {
             return ResponseEntity
                     .status(HttpStatus.OK)
@@ -80,7 +84,9 @@ public class CardController {
     public ResponseEntity<ResponseDTO> deleteCard(@RequestParam
                                                   @Size(min = 16, max = 16, message = "NIK should have 16 characters")
                                                   String nik) {
+        logger.debug("start-delete-card {}", nik);
         boolean isDeleted = iCardService.deleteCard(nik);
+        logger.debug("end-delete-card {}", nik);
         if (isDeleted) {
             return ResponseEntity
                     .status(HttpStatus.OK)

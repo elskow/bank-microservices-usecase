@@ -7,6 +7,8 @@ import learn.microservices.accounts.dto.CustomerDTO;
 import learn.microservices.accounts.dto.DevInfoDTO;
 import learn.microservices.accounts.dto.ResponseDTO;
 import learn.microservices.accounts.service.IAccountService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -22,8 +24,10 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RefreshScope
 public class AccountController {
+    private final static Logger logger = LoggerFactory.getLogger(CustomerController.class);
+
     private final IAccountService iAccountService;
-    
+
     private final Environment environment;
     private final DevInfoDTO devInfoDTO;
 
@@ -41,7 +45,9 @@ public class AccountController {
     public ResponseEntity<ResponseDTO> createAccount(@RequestBody
                                                      @Valid
                                                      CustomerDTO customerDTO) {
+        logger.debug("start-create-account {}", customerDTO.getNik());
         iAccountService.createAccount(customerDTO);
+        logger.debug("end-create-account {}", customerDTO.getNik());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDTO(AccountConstants.MESSAGE_201, AccountConstants.STATUS_201));
@@ -52,7 +58,9 @@ public class AccountController {
     public ResponseEntity<CustomerDTO> getAccountbyNik(@RequestParam
                                                        @Size(min = 16, max = 16, message = "NIK should have 16 characters")
                                                        String nik) {
+        logger.debug("start-get-account-by-nik {}", nik);
         CustomerDTO customerDTO = iAccountService.getAccountByNik(nik);
+        logger.debug("end-get-account-by-nik {}", nik);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -63,7 +71,9 @@ public class AccountController {
     public ResponseEntity<ResponseDTO> updateAccount(@RequestBody
                                                      @Valid
                                                      CustomerDTO customerDTO) {
+        logger.debug("start-update-account {}", customerDTO.getNik());
         boolean isUpdated = iAccountService.updateAccount(customerDTO);
+        logger.debug("end-update-account {}", customerDTO.getNik());
 
         if (isUpdated) {
             return ResponseEntity
@@ -80,7 +90,9 @@ public class AccountController {
     public ResponseEntity<ResponseDTO> deleteAccount(@RequestParam
                                                      @Size(min = 16, max = 16, message = "NIK should have 16 characters")
                                                      String nik) {
+        logger.debug("start-delete-account {}", nik);
         boolean isDeleted = iAccountService.deleteAccount(nik);
+        logger.debug("end-delete-account {}", nik);
 
         if (isDeleted) {
             return ResponseEntity
