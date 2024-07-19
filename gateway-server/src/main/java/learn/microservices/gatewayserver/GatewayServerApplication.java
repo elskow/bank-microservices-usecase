@@ -94,7 +94,6 @@ public class GatewayServerApplication {
                                         .setKeyResolver(userKeyResolver()))
                         )
                         .uri(CARDS_SERVICE_ID))
-
                 .build();
     }
 

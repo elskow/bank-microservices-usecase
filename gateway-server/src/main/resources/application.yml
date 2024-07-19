@@ -24,6 +24,11 @@ spring:
       cache-null-values: false
       time-to-live: 30000
       key-prefix: gateway-server
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "http://localhost:7080/realms/master/protocol/openid-connect/certs"
 
 management:
   endpoints:
