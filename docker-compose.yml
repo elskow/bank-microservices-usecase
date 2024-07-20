@@ -220,13 +220,28 @@ services:
     networks:
       - bank-loan
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    container_name: keycloak
+    ports:
+      - "7080:8080"
+    environment:
+      KEYCLOAK_ADMIN: "admin"
+      KEYCLOAK_ADMIN_PASSWORD: "admin"
+    command: "start-dev"
+    networks:
+      - bank-loan
+
   rabbitmq:
-    image: "rabbitmq:3.13.4-management"
+    image: "rabbitmq:3.13.3-management"
     container_name: rabbitmq
     hostname: "rabbitmq"
     ports:
       - "5672:5672"
       - "15672:15672"
+    depends_on:
+      gateway:
+        condition: service_healthy
     healthcheck:
       test: rabbitmq-diagnostics check_port_connectivity
       interval: 30s
@@ -335,7 +350,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
       OTEL_METRICS_EXPORTER: none
       OTEL_SERVICE_NAME: config-server
-
+  
   
   eureka-server:
     image: "helmyl/eureka-server"
@@ -367,8 +382,6 @@ services:
   cards:
     image: "helmyl/cards-ms"
     container_name: cards-ms
-    ports:
-      - "9000:9000"
     healthcheck:
       test: "curl --fail --silent localhost:9000/actuator/health/readiness | grep UP || exit 1"
       interval: 30s
@@ -404,8 +417,6 @@ services:
   loans:
     image: "helmyl/loans-ms"
     container_name: loans-ms
-    ports:
-      - "8090:8090"
     healthcheck:
       test: "curl --fail --silent localhost:8090/actuator/health/readiness | grep UP || exit 1"
       interval: 30s
@@ -441,8 +452,6 @@ services:
   accounts:
     image: "helmyl/accounts-ms"
     container_name: accounts-ms
-    ports:
-      - "8080:8080"
     healthcheck:
       test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
       interval: 30s
