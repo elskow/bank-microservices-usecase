@@ -1,0 +1,7 @@
+server:
+  port: 9010
+
+spring:
+  application:
+    name: messaging-server
+
