@@ -1,0 +1,6 @@
+dependencies:
+- name: loanbank-common
+  repository: file://../../loanbank-common
+  version: 0.1.0
+digest: sha256:181d6a5e63f3ff19178a4a2a3e8820849b9617df5f7af43f551644b221390e13
+generated: "2024-08-09T01:02:11.575655+07:00"

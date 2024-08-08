@@ -1,0 +1,24 @@
+dependencies:
+- name: loanbank-common
+  repository: file://../loanbank-common
+  version: 0.1.0
+- name: config-server
+  repository: file://../loanbank-services/config-server
+  version: 0.1.0
+- name: eureka-server
+  repository: file://../loanbank-services/eureka-server
+  version: 0.1.0
+- name: accounts
+  repository: file://../loanbank-services/accounts
+  version: 0.1.0
+- name: cards
+  repository: file://../loanbank-services/cards
+  version: 0.1.0
+- name: loans
+  repository: file://../loanbank-services/loans
+  version: 0.1.0
+- name: gateway-server
+  repository: file://../loanbank-services/gateway-server
+  version: 0.1.0
+digest: sha256:3ec367edcd21b44938b8d5757c3183a7fbe7e416a286749d0d7ca49f58157619
+generated: "2024-08-09T01:10:27.696779+07:00"
