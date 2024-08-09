@@ -10,7 +10,7 @@ replicaCount: 1
 
 image:
   repository: helmyl/eureka-server
-  tag: s14
+  tag: latest
 
 containerPort: 8070
 

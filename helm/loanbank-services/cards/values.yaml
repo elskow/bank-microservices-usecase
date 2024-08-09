@@ -9,7 +9,7 @@ appName: cards
 replicaCount: 1
 
 image:
-  repository: helmyl/cards
+  repository: helmyl/cards-ms
   tag: latest
 
 containerPort: 9000

@@ -9,8 +9,8 @@ appName: loans
 replicaCount: 1
 
 image:
-  repository: eazybytes/loans
-  tag: s14
+  repository: helmyl/loans-ms
+  tag: latest
 
 containerPort: 8090
 

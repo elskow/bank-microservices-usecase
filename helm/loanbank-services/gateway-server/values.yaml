@@ -9,8 +9,8 @@ appName: gateway-server
 replicaCount: 1
 
 image:
-  repository: eazybytes/gateway-server
-  tag: s14
+  repository: helmyl/gateway-server
+  tag: latest
 
 containerPort: 8072
 

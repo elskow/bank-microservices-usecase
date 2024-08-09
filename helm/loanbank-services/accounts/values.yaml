@@ -9,7 +9,7 @@ appName: accounts
 replicaCount: 1
 
 image:
-  repository: helmyl/accounts
+  repository: helmyl/accounts-ms
   tag: latest
 
 containerPort: 8080

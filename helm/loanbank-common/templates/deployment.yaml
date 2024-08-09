@@ -73,5 +73,11 @@ spec:
             - name: OTEL_SERVICE_NAME
               value: {{ .Values.appName }}
         {{- end }}
-
+        {{- if .Values.rabbitmq_enabled }}
+            - name: SPRING_RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.global.configMapName }}
+                  key: SPRING_RABBITMQ_HOST
+        {{- end }}
 {{- end -}}
