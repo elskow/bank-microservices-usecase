@@ -20,7 +20,6 @@ service:
   targetPort: 9000
 
 appname_enabled: true
-profile_enabled: true
 config_enabled: true
 eureka_enabled: true
 resouceserver_enabled: false

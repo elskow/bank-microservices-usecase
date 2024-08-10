@@ -20,7 +20,6 @@ service:
   targetPort: 8070
 
 appname_enabled: true
-profile_enabled: false
 config_enabled: true
 eureka_enabled: false
 resouceserver_enabled: false
