@@ -4,6 +4,9 @@ spring:
   config:
     import: "optional:configserver:http://localhost:8071/"
   cloud:
+    kubernetes:
+      discovery:
+        all-namespaces: true
     gateway:
       discovery:
         locator:
@@ -12,6 +15,10 @@ spring:
       httpclient:
         connect-timeout: 2000
         response-timeout: 10s
+    discovery:
+      client:
+        health-indicator:
+          enabled: false
   data:
     redis:
       connect-timeout: 2s

@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.circuitbreaker.resilience4j.ReactiveResilience4JCircuitBreakerFactory;
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
 import org.springframework.cloud.client.circuitbreaker.Customizer;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.RouteLocator;
@@ -22,11 +23,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 @EnableCaching
+@EnableDiscoveryClient
 @SpringBootApplication
 public class GatewayServerApplication {
-    private static final String ACCOUNTS_SERVICE_ID = "lb://ACCOUNTS";
-    private static final String LOANS_SERVICE_ID = "lb://LOANS";
-    private static final String CARDS_SERVICE_ID = "lb://CARDS";
+    private static final String ACCOUNTS_SERVICE_ID = "http://accounts:8080";
+    private static final String LOANS_SERVICE_ID = "http://loans:8090";
+    private static final String CARDS_SERVICE_ID = "http://cards:9000";
 
     public static void main(String[] args) {
         SpringApplication.run(GatewayServerApplication.class, args);
